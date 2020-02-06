@@ -127,6 +127,7 @@ namespace NinjaApp
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(name: "default", pattern: "api/{controller}/{action}");
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
