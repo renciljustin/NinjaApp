@@ -1,0 +1,52 @@
+@page "/users"
+
+@using NinjaApp.Persistence.Dtos
+@using System.Net.Http
+
+<h1>Users</h1>
+
+@if ( _users is null )
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Birth Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in _users)
+            {
+                <tr>
+                    <td>
+                        <a class="btn btn-link" href="users/@user.UserName" role="button">
+                            @($"{user.FirstName} {user.LastName}")
+                        </a>
+                    </td>
+                    <td>@($"{user.BirthDate:MMMM dd, yyyy}")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    private readonly HttpClient _http;
+
+    public Users()
+    {
+        _http = new HttpClient();
+    }
+
+    private List<UserListDto> _users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await _http.GetJsonAsync<List<UserListDto>>("http://localhost:5000/api/users");
+    }
+}

@@ -1,0 +1,51 @@
+@page "/users/{username}"
+
+@using NinjaApp.Persistence.Dtos
+@using System.Net.Http
+
+@if(_user is null)
+{
+    <h1>Loading user details...</h1>
+}
+else
+{
+    <form>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" id="firstName" placeholder="First Name" @bind=_user.FirstName />
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" class="form-control" id="lastName" placeholder="Last Name" @bind=_user.LastName />
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date</label>
+            <input type="date" class="form-control" id="birthDate" placeholder="Birth Date" @bind=_user.BirthDate />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Email" @bind=_user.Email />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+}
+
+@code
+{
+    private UserDetailDto _user;
+
+    [Parameter]
+    public string UserName { get; set; }
+
+    private readonly HttpClient _http;
+
+    public UserDetail()
+    {
+        _http = new HttpClient();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await _http.GetJsonAsync<UserDetailDto>($"http://localhost:5000/api/users/{UserName}");
+    }
+}
