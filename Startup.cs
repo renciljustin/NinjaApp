@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NinjaApp.Core.Models;
+using NinjaApp.Core.Seeds;
 using NinjaApp.Data;
 using NinjaApp.Persistence;
 
@@ -32,11 +35,26 @@ namespace NinjaApp
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
 
-            services.AddDbContext<NinjaDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<NinjaDbContext>
+                (opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
+            var builder = services.AddIdentityCore<User>(opt => {
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequiredLength = 8;
+            });
+            
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<NinjaDbContext>()
+                .AddDefaultTokenProviders();
+            
+            services.AddTransient<SeedUsersAndRoles>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SeedUsersAndRoles seed)
         {
             if (env.IsDevelopment())
             {
@@ -49,7 +67,9 @@ namespace NinjaApp
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            seed.BeginSeeding();
+
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
