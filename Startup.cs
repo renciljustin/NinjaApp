@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NinjaApp.Core;
 using NinjaApp.Core.Models;
 using NinjaApp.Core.Seeds;
 using NinjaApp.Data;
@@ -51,6 +52,9 @@ namespace NinjaApp
                 .AddDefaultTokenProviders();
             
             services.AddTransient<SeedUsersAndRoles>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
