@@ -1,15 +1,19 @@
 using System;
+using System.Net;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using NinjaApp.Core;
 using NinjaApp.Core.Models;
 using NinjaApp.Core.Seeds;
@@ -89,9 +93,22 @@ namespace NinjaApp
             }
             else
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                app.UseExceptionHandler(builder => {
+                    builder.Run(async context => {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        context.Response.ContentType = "application/json";
+
+                        var contextFeatures = context.Features.Get<IExceptionHandlerFeature>();
+
+                        if (context != null)
+                        {
+                            context.Response.Headers.Add("Application-Error", contextFeatures.Error.Message);
+                            context.Response.Headers.Add("Access-Control-Expose-Headers", "Application-Error");
+                            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            await context.Response.WriteAsync(JsonConvert.SerializeObject(contextFeatures.Error.Message));
+                        }
+                    });
+                });
             }
 
             seed.BeginSeeding();
