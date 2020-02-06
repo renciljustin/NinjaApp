@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,7 @@ namespace NinjaApp
 
             services.AddDbContext<NinjaDbContext>
                 (opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddAutoMapper(typeof(Startup));
             
             var builder = services.AddIdentityCore<User>(opt => {
                 opt.Password.RequireDigit = false;
