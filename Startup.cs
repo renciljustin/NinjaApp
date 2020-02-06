@@ -17,7 +17,6 @@ using Newtonsoft.Json;
 using NinjaApp.Core;
 using NinjaApp.Core.Models;
 using NinjaApp.Core.Seeds;
-using NinjaApp.Data;
 using NinjaApp.Persistence;
 using NinjaApp.Shared.Enums;
 
@@ -39,8 +38,6 @@ namespace NinjaApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddCors();
-
-            services.AddSingleton<WeatherForecastService>();
 
             services.AddDbContext<NinjaDbContext>
                 (opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
