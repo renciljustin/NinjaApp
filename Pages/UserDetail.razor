@@ -4,7 +4,7 @@
 @using System.Net.Http
 
 
-<button class="btn btn-success" style="visibility: @(!visibleOnUpdate ? "visible" : "hidden")" @onclick=ToggleUpdate>
+<button class="btn btn-success" style="visibility: @idleModeVisble" @onclick=ToggleUpdate>
     <span class="oi oi-pencil"></span> Edit
 </button>
 
@@ -33,7 +33,7 @@ else
         </div>
     </form>
 
-    <div style="visibility: @(visibleOnUpdate ? "visible" : "hidden")">
+    <div style="visibility: @updateModeVisible">
         <button type="submit" class="btn btn-primary" form="updateUserForm">Save Changes</button>
         <button tpye="button" class="btn btn-dark" @onclick=ToggleUpdate>Cancel</button>
     </div>
@@ -43,7 +43,8 @@ else
 {
     private UserDetailDto _user;
 
-    private bool visibleOnUpdate;
+    private string updateModeVisible = "hidden";
+    private string idleModeVisble = "visible";
 
     [Parameter]
     public string UserName { get; set; }
@@ -62,11 +63,15 @@ else
 
     public void ToggleUpdate()
     {
-        visibleOnUpdate = !visibleOnUpdate;
+        idleModeVisble = idleModeVisble == "visible" ? "hidden" : "visible";
+        updateModeVisible = updateModeVisible == "visible" ? "hidden" : "visible";
     }
 
     public async void UpdateUser()
     {
         await _http.PutJsonAsync($"http://localhost:5000/api/users/{UserName}", _user);
+
+        ToggleUpdate();
+        StateHasChanged();
     }
 }
