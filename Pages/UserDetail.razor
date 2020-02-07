@@ -14,7 +14,7 @@
 }
 else
 {
-    <form id="updateUserForm">
+    <form id="updateUserForm" @onsubmit=UpdateUser>
         <div class="form-group">
             <label for="firstName">First Name</label>
             <input type="text" class="form-control" id="firstName" placeholder="First Name" @bind=_user.FirstName />
@@ -60,9 +60,13 @@ else
         _user = await _http.GetJsonAsync<UserDetailDto>($"http://localhost:5000/api/users/{UserName}");
     }
 
-
     public void ToggleUpdate()
     {
         visibleOnUpdate = !visibleOnUpdate;
+    }
+
+    public async void UpdateUser()
+    {
+        await _http.PutJsonAsync($"http://localhost:5000/api/users/{UserName}", _user);
     }
 }

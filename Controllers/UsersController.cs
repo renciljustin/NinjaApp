@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NinjaApp.Core;
+using NinjaApp.Core.Models;
 using NinjaApp.Persistence.Dtos;
 using NinjaApp.Shared.Enums;
 
@@ -40,6 +41,27 @@ namespace NinjaApp.Controllers {
             var userToReturn = _mapper.Map<UserDetailDto>(userFromDb);
 
             return Ok(userToReturn);
+        }
+
+        [HttpPut("{userName}")]
+        public async Task<IActionResult> UpdateUser(string userName, UserDetailDto user)
+        {
+            if ( user == null || user.UserName == null )
+                return BadRequest("Invalid account details.");
+
+            if ( userName != user.UserName )
+                return Unauthorized("You are not authorized to edit someone's account.");
+
+            var userFromDb = await _userRepository.GetUserByUserNameAsync( user.UserName );
+
+            if ( userFromDb == null )
+                return BadRequest("Account not exists.");
+
+            var userFromRequest = _mapper.Map<User>(user);
+
+            var updatedUser = await _userRepository.UpdateUserAsync( userFromDb, userFromRequest );
+
+            return Ok( _mapper.Map<UserDetailDto>(updatedUser) );
         }
     }
 }

@@ -12,6 +12,7 @@ namespace NinjaApp.Mapping
             CreateMap<User, UserListDto>();
 
             CreateMap<UserRegisterDto, User>();
+            CreateMap<UserDetailDto, User>();
         }
     }
 }

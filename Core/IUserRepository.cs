@@ -8,5 +8,6 @@ namespace NinjaApp.Core
     {
          Task<IEnumerable<User>> GetUsersAsync();
          Task<User> GetUserByUserNameAsync(string userName);
+         Task<User> UpdateUserAsync(User oldUser, User newUser);
     }
 }
